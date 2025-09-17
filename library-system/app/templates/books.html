@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}Tìm kiếm sách{% endblock %}
+{% block content %}
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">
+    <i class="bi bi-search me-2"></i>Tìm kiếm sách
+  </h1>
+  <span class="badge bg-primary fs-6">{{ books|length }} kết quả</span>
+</div>
+
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <form method="get">
+
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="kw" class="form-label">Từ khóa</label>
+          <input id="kw" name="kw" class="form-control" placeholder="Tên sách, tác giả, NXB, ISBN..." value="{{ kw or '' }}">
+        </div>
+
+
+        <div class="col-md-6">
+          <label for="category_id" class="form-label">Thể loại</label>
+          <select id="category_id" name="category_id" class="form-select">
+            <option value="">-- Tất cả thể loại --</option>
+            {% for c in categories %}
+              <option value="{{ c.id }}" {{ 'selected' if category_id==c.id else '' }}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+
+        </div>
+        <div class="col-md-6">
+          <label for="author_id" class="form-label">Tác giả</label>
+          <select id="author_id" name="author_id" class="form-select">
+            <option value="">-- Tất cả tác giả --</option>
+            {% for a in authors %}
+              <option value="{{ a.id }}" {{ 'selected' if author_id==a.id else '' }}>{{ a.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="publisher_id" class="form-label">Nhà xuất bản</label>
+          <select id="publisher_id" name="publisher_id" class="form-select">
+            <option value="">-- Tất cả NXB --</option>
+            {% for p in publishers %}
+              <option value="{{ p.id }}" {{ 'selected' if publisher_id==p.id else '' }}>{{ p.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12">
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-search me-1"></i>Tìm kiếm
+            </button>
+            <a href="{{ url_for('books') }}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-clockwise me-1"></i>Đặt lại
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+{% if books %}
+  <div class="row g-4">
+    {% for b in books %}
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <div class="card h-100 shadow-sm border-0 book-card">
+          <div class="position-relative">
+            {% if b.image %}
+              <img src="{{ b.image }}" class="card-img-top" alt="{{ b.name }}" style="height: 250px; object-fit: cover;">
+            {% else %}
+              <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                <i class="bi bi-book text-muted" style="font-size: 3rem;"></i>
+              </div>
+            {% endif %}
+            {% if not b.is_available %}
+              <span class="position-absolute top-0 end-0 badge bg-danger m-2">Hết sách</span>
+            {% else %}
+              <span class="position-absolute top-0 end-0 badge bg-success m-2">Còn {{ b.available_quantity }}</span>
+            {% endif %}
+          </div>
+
+
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-truncate" title="{{ b.name }}">{{ b.name }}</h5>
+            <div class="text-muted small mb-2">
+              {% if b.category %}
+                <span class="badge bg-light text-dark me-1">{{ b.category.name }}</span>
+              {% endif %}
+              {% if b.publication_year %}
+                <span class="badge bg-light text-dark">{{ b.publication_year }}</span>
+              {% endif %}
+
+
+            </div>
+            <p class="card-text small text-muted mb-2">
+              {% if b.author %}<strong>Tác giả:</strong> {{ b.author.name }}<br>{% endif %}
+              {% if b.publisher %}<strong>NXB:</strong> {{ b.publisher.name }}{% endif %}
+            </p>
+            <p class="card-text small text-truncate mb-3" title="{{ b.description }}">{{ b.description }}</p>
+            <div class="mt-auto">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-primary">{{ "{:,.0f}".format(b.price|default(0)) }} đ</span>
+                {% if b.isbn %}
+                  <small class="text-muted">ISBN: {{ b.isbn }}</small>
+                {% endif %}
+              </div>
+              <a class="btn btn-primary btn-sm w-100" href="{{ url_for('book_detail', book_id=b.id) }}">
+                <i class="bi bi-eye me-1"></i>Xem chi tiết
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+
+{% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+    <h4 class="text-muted mt-3">Không tìm thấy sách phù hợp</h4>
+    <p class="text-muted">Hãy thử với từ khóa khác hoặc điều chỉnh bộ lọc tìm kiếm</p>
+    <a href="{{ url_for('books') }}" class="btn btn-outline-primary">Xem tất cả sách</a>
+  </div>
+{% endif %}
+
+<style>
+.book-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.book-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+</style>
+{% endblock %}

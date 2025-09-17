@@ -3,7 +3,8 @@ from enum import Enum as RoleEnum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.functions import now
 
-from app import db, app
+
+from . import db
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, Enum, func
 
@@ -65,21 +66,33 @@ class Publisher(db.Model):
         return f'NXB: {self.name}'
 
 
-# Bảng sách
+
 class Book(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
+    isbn = Column(String(20), nullable=True, unique=True)
     image = Column(String(255), nullable=True)
     price = Column(Integer, nullable=False)
     quantity = Column(Integer, nullable=False, default=1)
-    description = Column(String(255), nullable=False)
-    # Relationships
+    available_quantity = Column(Integer, nullable=False, default=1)
+    description = Column(String(1000), nullable=False)
+    publication_year = Column(Integer, nullable=True)
+    pages = Column(Integer, nullable=True)
+    language = Column(String(50), nullable=True, default='Tiếng Việt')
+    created_date = Column(DateTime, default=func.now())
     category_id = Column(Integer, ForeignKey(Category.id))
     author_id = Column(Integer, ForeignKey(Author.id))
     publisher_id = Column(Integer, ForeignKey(Publisher.id))
+    
+    def __str__(self):
+        return self.name
+    
+    @property
+    def is_available(self):
+        return self.available_quantity > 0
 
 
-# Bảng phiếu mượn sách
+
 class BorrowingSlip(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_user = Column(Integer, ForeignKey(User.id))
@@ -90,7 +103,7 @@ class BorrowingSlip(db.Model):
     details = relationship("BorrowingSlipDetail", backref="borrowing_slip", lazy=True)
 
 
-# Bảng chi tiết phiếu mượn sách
+
 class BorrowingSlipDetail(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_borrowing_slip = Column(Integer, ForeignKey(BorrowingSlip.id))
