@@ -1,39 +1,174 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous"></script>
-    <title>Trang chủ</title>
-</head>
-<body>
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="javascript:void(0)">Hệ thống thư viện số</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="mynavbar">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:void(0)">Mượn sách</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:void(0)">Tìm kiếm sách</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:void(0)">Lịch sử mượn trả</a>
-                </li>
-            </ul>
-            <form class="d-flex">
-                <input class="form-control me-2" type="text" placeholder="Nhập tên sách...">
-                <button class="btn btn-primary" type="button">Tìm sách</button>
-            </form>
-        </div>
+{% extends "base.html" %}
+{% block title %}Trang chủ - Thư viện số{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+
+
+
+<div class="bg-primary text-white rounded-4 p-5 mb-5">
+  <div class="row align-items-center">
+    <div class="col-lg-8">
+      <h1 class="display-4 fw-bold mb-3">Chào mừng đến với Thư viện số</h1>
+      <p class="lead mb-4">Khám phá kho tàng tri thức với hàng ngàn đầu sách đa dạng. Tìm kiếm, đọc và mượn sách một cách dễ dàng.</p>
+      <div class="d-flex gap-3">
+        <a href="{{ url_for('books') }}" class="btn btn-light btn-lg">
+          <i class="bi bi-search me-2"></i>Tìm kiếm sách
+        </a>
+        <a href="#categories" class="btn btn-outline-light btn-lg">
+          <i class="bi bi-grid me-2"></i>Danh mục
+        </a>
+      </div>
     </div>
-</nav>
-</body>
-</html>
+
+
+    <div class="col-lg-4 text-center">
+      <i class="bi bi-book-half" style="font-size: 8rem; opacity: 0.3;"></i>
+    </div>
+  </div>
+</div>
+
+
+<div class="card shadow-sm mb-5">
+  <div class="card-body">
+    <h5 class="card-title mb-3">
+      <i class="bi bi-lightning-fill text-warning me-2"></i>Tìm kiếm nhanh
+    </h5>
+
+    <form action="{{ url_for('books') }}" method="get">
+      <div class="row g-3">
+        <div class="col-md-8">
+          <input name="kw" class="form-control form-control-lg" placeholder="Nhập tên sách, tác giả, hoặc từ khóa...">
+        </div>
+
+
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary btn-lg w-100">
+            <i class="bi bi-search me-2"></i>Tìm kiếm
+          </button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+
+{% if popular_books %}
+<section class="mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h3 mb-0">
+      <i class="bi bi-star-fill text-warning me-2"></i>Sách phổ biến
+    </h2>
+    <a href="{{ url_for('books') }}" class="btn btn-outline-primary">
+      Xem tất cả <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+  </div>
+  
+  <div class="row g-4">
+    {% for book in popular_books %}
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card h-100 shadow-sm border-0 book-card">
+
+        <div class="position-relative">
+          {% if book.image %}
+            <img src="{{ book.image }}" class="card-img-top" alt="{{ book.name }}" style="height: 200px; object-fit: cover;">
+          {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+              <i class="bi bi-book text-muted" style="font-size: 2rem;"></i>
+            </div>
+          {% endif %}
+          {% if book.is_available %}
+            <span class="position-absolute top-0 end-0 badge bg-success m-2">Có sẵn</span>
+          {% else %}
+            <span class="position-absolute top-0 end-0 badge bg-danger m-2">Hết sách</span>
+          {% endif %}
+        </div>
+
+
+        <div class="card-body d-flex flex-column">
+          <h6 class="card-title text-truncate" title="{{ book.name }}">{{ book.name }}</h6>
+          <p class="card-text small text-muted mb-2">
+            {% if book.author %}{{ book.author.name }}{% endif %}
+          </p>
+          <div class="mt-auto">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-bold text-primary small">{{ "{:,.0f}".format(book.price|default(0)) }} đ</span>
+            </div>
+            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-outline-primary btn-sm w-100">
+              Xem chi tiết
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Danh mục sách -->
+{% if categories %}
+<section id="categories" class="mb-5">
+  <h2 class="h3 mb-4">
+    <i class="bi bi-grid-3x3-gap-fill text-info me-2"></i>Danh mục sách
+  </h2>
+  
+  <div class="row g-3">
+    {% for category in categories %}
+    <div class="col-6 col-md-4 col-lg-3">
+      <a href="{{ url_for('books', category_id=category.id) }}" class="text-decoration-none">
+        <div class="card h-100 border-0 bg-light category-card">
+          <div class="card-body text-center">
+            <i class="bi bi-bookmark-fill text-primary mb-3" style="font-size: 2rem;"></i>
+            <h6 class="card-title">{{ category.name }}</h6>
+            {% if category.description %}
+              <p class="card-text small text-muted">{{ category.description }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+</section>
+{% endif %}
+
+
+<section class="mb-5">
+  <h2 class="h3 mb-4 text-center">Tính năng nổi bật</h2>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="text-center">
+        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+          <i class="bi bi-search text-primary" style="font-size: 2rem;"></i>
+        </div>
+        <h5>Tìm kiếm thông minh</h5>
+        <p class="text-muted">Tìm kiếm sách theo tên, tác giả, thể loại, ISBN một cách nhanh chóng và chính xác.</p>
+      </div>
+
+    </div>
+    <div class="col-md-4">
+      <div class="text-center">
+        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+          <i class="bi bi-info-circle text-success" style="font-size: 2rem;"></i>
+        </div>
+        <h5>Thông tin chi tiết</h5>
+        <p class="text-muted">Xem thông tin đầy đủ về sách bao gồm mô tả, tác giả, nhà xuất bản và tình trạng.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-center">
+        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+          <i class="bi bi-bookmark-plus text-warning" style="font-size: 2rem;"></i>
+        </div>
+        <h5>Đăng ký mượn</h5>
+        <p class="text-muted">Đăng ký mượn sách trực tuyến một cách đơn giản và theo dõi lịch sử mượn trả.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{% endblock %}
