@@ -1,6 +1,7 @@
 import json
 from sqlalchemy import or_
 from .models import Book, Category, Author, Publisher
+from . import db
 
 def auth_user(username, password):
     with open("../app/data/users.json", encoding='utf-8') as f:
@@ -56,6 +57,76 @@ def get_popular_books(limit=10):
 
 def get_books_by_category(category_id: int, limit=10):
     return Book.query.filter(Book.category_id == category_id, Book.available_quantity > 0).limit(limit).all()
+
+
+def get_all_categories():
+    return Category.query.order_by(Category.name.asc()).all()
+
+
+def add_author(name: str):
+    existing_author = Author.query.filter(Author.name.ilike(name)).first()
+    if existing_author:
+        return None
+
+    new_author = Author(name=name)
+    db.session.add(new_author)
+    db.session.commit()
+    return new_author
+
+
+def add_category(name: str):
+    existing_category = Category.query.filter(Category.name.ilike(name)).first()
+    if existing_category:
+        return None
+
+    new_category = Category(name=name)
+    db.session.add(new_category)
+    db.session.commit()
+    return new_category
+
+
+def add_publisher(name: str):
+    existing_publisher = Publisher.query.filter(Publisher.name.ilike(name)).first()
+    if existing_publisher:
+        return None
+
+    new_publisher = Publisher(name=name)
+    db.session.add(new_publisher)
+    db.session.commit()
+    return new_publisher
+
+def add_book(name, price, quantity, author_id, category_id, publisher_id, description, image=None):
+    new_book = Book(
+        name=name, price=price, quantity=quantity,
+        available_quantity=quantity, author_id=author_id,
+        category_id=category_id, publisher_id=publisher_id,
+        description=description,
+        image=image if image else f'https://placehold.co/300x450/cccccc/ffffff?text={name.replace(" ", "+")}'
+    )
+    db.session.add(new_book)
+    db.session.commit()
+    return new_book
+
+def update_book(book_id, data):
+    book = get_book(book_id)
+    if not book:
+        raise ValueError("Sách không tồn tại.")
+
+    for key, value in data.items():
+        if value is not None:
+            setattr(book, key, value)
+
+    db.session.commit()
+    return book
+
+def delete_book(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        raise Exception("Không tìm thấy sách để xóa!")
+
+    db.session.delete(book)
+    db.session.commit()
+
 
 if __name__=="__main__":
     print(auth_user("user", 345))
