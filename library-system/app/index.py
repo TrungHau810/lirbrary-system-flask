@@ -17,11 +17,11 @@ def books():
     cat = request.args.get("category_id", type=int)
     author = request.args.get("author_id", type=int)
     publisher = request.args.get("publisher_id", type=int)
-    
-  
+
+
     data = search_books(kw, cat, author, publisher)
-    
-   
+
+
     categories = Category.query.order_by(Category.name.asc()).all()
     authors = get_all_authors()
     publishers = get_all_publishers()
@@ -29,13 +29,13 @@ def books():
     print(data)
 
 
-    
-    return render_template("books.html", 
-                         books=data, 
+
+    return render_template("books.html",
+                         books=data,
                          categories=categories,
                          authors=authors,
                          publishers=publishers,
-                         kw=kw, 
+                         kw=kw,
                          category_id=cat,
                          author_id=author,
                          publisher_id=publisher)
@@ -50,8 +50,16 @@ def book_detail(book_id):
     if b.category_id:
         related_books = get_books_by_category(b.category_id, 4)
         related_books = [book for book in related_books if book.id != b.id]
-    
+
     return render_template("book_detail.html", b=b, related_books=related_books)
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
 
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1', port=5000)
