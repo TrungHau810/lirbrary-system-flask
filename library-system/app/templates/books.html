@@ -106,6 +106,8 @@
             </p>
             <p class="card-text small text-truncate mb-3" title="{{ b.description }}">{{ b.description }}</p>
             <div class="mt-auto">
+
+
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="fw-bold text-primary">{{ "{:,.0f}".format(b.price|default(0)) }} đ</span>
                 {% if b.isbn %}
