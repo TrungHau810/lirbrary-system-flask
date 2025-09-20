@@ -3,7 +3,6 @@ from enum import Enum as RoleEnum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.functions import now
 
-
 from . import db
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, Enum, func
