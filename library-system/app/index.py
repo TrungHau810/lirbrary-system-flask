@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, abort
-
-from . import app
+from flask import Flask, render_template, request, abort, flash, redirect, url_for
+from werkzeug.security import generate_password_hash
+from . import app, db
 from .dao import search_books, get_book, get_all_authors, get_all_publishers, get_popular_books, get_books_by_category
-from .models import Category
+from .models import Category, User, UserRole
 
 
 @app.route("/")
@@ -57,8 +57,41 @@ def book_detail(book_id):
 def login():
     return render_template("login.html")
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        fullname = request.form.get("fullname")
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        email = request.form.get("email")
+
+        if password != confirm_password:
+            flash("Mật khẩu xác nhận không khớp", "danger")
+            return redirect(url_for("register"))
+
+        if User.query.filter_by(username=username).first():
+            flash("Tên đăng nhập đã tồn tại", "danger")
+            return redirect(url_for("register"))
+        if User.query.filter_by(email=email).first():
+            flash("Email đã tồn tại", "danger")
+            return redirect(url_for("register"))
+
+        new_user = User(
+            username=username,
+            full_name=fullname,
+            email=email,
+            password=generate_password_hash(password, method="pbkdf2:sha256", salt_length=16),
+            avatar="default.png",
+            user_role=UserRole.STUDENT
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash("Đăng ký thành công!", "success")
+        return redirect(url_for("login"))
+
     return render_template("register.html")
 
 if __name__ == "__main__":

@@ -5,6 +5,17 @@
     <div class="col-md-8 col-lg-5">
         <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-5">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
                 <div class="text-center mb-4">
                     <h3 class="mt-2 fw-bold">Đăng ký tài khoản</h3>
                     <p class="text-muted">Hệ thống thư viện số</p>
@@ -16,7 +27,8 @@
                         <label for="fullname" class="form-label">Họ và tên</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Nguyễn Văn A" required>
+                            <input type="text" class="form-control" id="fullname" name="fullname"
+                                   placeholder="Nguyễn Văn A" required>
                         </div>
                     </div>
 
@@ -24,7 +36,8 @@
                         <label for="username" class="form-label">Tên đăng nhập</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Tên đăng nhập" required>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   placeholder="Tên đăng nhập" required>
                         </div>
                     </div>
 
@@ -32,7 +45,8 @@
                         <label for="password" class="form-label">Mật khẩu</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="******" required>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="******" required>
                         </div>
                     </div>
 
@@ -40,7 +54,8 @@
                         <label for="confirm_password" class="form-label">Xác nhận mật khẩu</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="******" required>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password"
+                                   placeholder="******" required>
                         </div>
                     </div>
 
@@ -48,7 +63,8 @@
                         <label for="student_id" class="form-label">MSSV</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-card-text"></i></span>
-                            <input type="text" class="form-control" id="student_id" name="student_id" placeholder="12345678" required>
+                            <input type="text" class="form-control" id="student_id" name="student_id"
+                                   placeholder="12345678" required>
                         </div>
                     </div>
 
@@ -56,7 +72,8 @@
                         <label for="email" class="form-label">Email</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="example@gmail.com" required>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="example@gmail.com" required>
                         </div>
                     </div>
 
