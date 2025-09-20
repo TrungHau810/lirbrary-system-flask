@@ -20,12 +20,12 @@
           <label for="kw" class="form-label">Từ khóa</label>
           <input type="text" id="kw" name="kw" placeholder="Nhập tên sách, tác giả..." value="{{ kw or '' }}" class="form-control">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
           <label for="category_id" class="form-label">Thể loại</label>
-          <select name="category_id" id="category_id" class="form-select">
+          <select id="category_id" name="category_id" class="form-select">
             <option value="">-- Tất cả thể loại --</option>
             {% for c in categories %}
-            <option value="{{ c.id }}" {% if category_id==c.id %}selected{% endif %}>{{ c.name }}</option>
+              <option value="{{ c.id }}" {{ 'selected' if category_id==c.id else '' }}>{{ c.name }}</option>
             {% endfor %}
           </select>
         </div>
