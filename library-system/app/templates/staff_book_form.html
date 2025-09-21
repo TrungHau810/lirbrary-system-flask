@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Thêm sách mới{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10 col-xl-9">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h4 class="mb-3">Thêm sách mới</h4>
+        <form method="post" action="{{ url_for('create_book') }}">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label">Tên sách</label>
+              <input name="name" class="form-control" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">ISBN</label>
+              <input name="isbn" class="form-control">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Ảnh (URL)</label>
+              <input name="image" class="form-control" placeholder="https://...">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Ngôn ngữ</label>
+              <input name="language" class="form-control" placeholder="Tiếng Việt">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Giá (đ)</label>
+              <input type="number" name="price" class="form-control" min="0" value="0">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Số lượng nhập</label>
+              <input type="number" name="quantity" class="form-control" min="1" value="1">
+            </div>
+
+
+            <div class="col-md-4">
+              <label class="form-label">Số lượng khả dụng</label>
+              <input type="number" name="available_quantity" class="form-control" min="0" placeholder="(mặc định = số lượng)">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Năm xuất bản</label>
+              <input type="number" name="publication_year" class="form-control" min="0">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Số trang</label>
+              <input type="number" name="pages" class="form-control" min="1">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Danh mục hiện có</label>
+              <select name="category_id" class="form-select">
+                <option value="">-- Chọn danh mục --</option>
+                {% for c in categories %}
+                  <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+              </select>
+
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Tác giả hiện có</label>
+              <select name="author_id" class="form-select">
+                <option value="">-- Chọn tác giả --</option>
+                {% for a in authors %}
+                  <option value="{{ a.id }}">{{ a.name }}</option>
+                {% endfor %}
+              </select>
+
+
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">NXB hiện có</label>
+              <select name="publisher_id" class="form-select">
+                <option value="">-- Chọn NXB --</option>
+                {% for p in publishers %}
+                  <option value="{{ p.id }}">{{ p.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+
+
+            <div class="col-md-4">
+              <label class="form-label">Hoặc thêm danh mục mới</label>
+              <input name="new_category" class="form-control" placeholder="Tên danh mục mới">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Hoặc thêm tác giả mới</label>
+              <input name="new_author" class="form-control" placeholder="Tên tác giả mới">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Hoặc thêm NXB mới</label>
+              <input name="new_publisher" class="form-control" placeholder="Tên NXB mới">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Mô tả</label>
+              <textarea name="description" class="form-control" rows="5" required></textarea>
+            </div>
+          </div>
+
+
+          <div class="d-flex gap-2 mt-4">
+            <a href="{{ url_for('books') }}" class="btn btn-outline-secondary">Hủy</a>
+            <button type="submit" class="btn btn-primary">Lưu sách</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

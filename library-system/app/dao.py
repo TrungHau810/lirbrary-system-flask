@@ -1,6 +1,7 @@
+import hashlib
 import json
 from sqlalchemy import or_
-from .models import Book, Category, Author, Publisher
+from .models import Book, Category, Author, Publisher, User, BorrowingSlip, BorrowingSlipDetail
 
 
 def auth_user(username, password):
@@ -12,6 +13,19 @@ def auth_user(username, password):
                 return True
 
     return False
+
+
+def login_account(username, password):
+    user = User.query.filter_by(username=username).first()
+    if user and user.password == str(hashlib.md5(password.encode('utf-8')).hexdigest()):
+        return user
+
+    return None
+
+
+def get_users():
+    user_list = User.query.all()
+    return user_list
 
 
 def search_books(keyword: str | None = None, category_id: int | None = None, author_id: int | None = None,
@@ -63,6 +77,13 @@ def get_popular_books(limit=10):
 def get_books_by_category(category_id: int, limit=10):
     return Book.query.filter(Book.category_id == category_id, Book.available_quantity > 0).limit(limit).all()
 
+
+def get_list_requests():
+    requests = BorrowingSlip.query.all()
+    for r in requests:
+        r.total = BorrowingSlipDetail.query.filter(BorrowingSlipDetail.id_borrowing_slip == r.id).count()
+
+    return requests
 
 if __name__ == "__main__":
     print(auth_user("user", 345))

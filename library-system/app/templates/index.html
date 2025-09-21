@@ -4,8 +4,6 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 
-
-
 <div class="bg-primary text-white rounded-4 p-5 mb-5">
   <div class="row align-items-center">
     <div class="col-lg-8">
@@ -27,32 +25,6 @@
     </div>
   </div>
 </div>
-
-
-<div class="card shadow-sm mb-5">
-  <div class="card-body">
-    <h5 class="card-title mb-3">
-      <i class="bi bi-lightning-fill text-warning me-2"></i>Tìm kiếm nhanh
-    </h5>
-
-    <form action="{{ url_for('books') }}" method="get">
-      <div class="row g-3">
-        <div class="col-md-8">
-          <input name="kw" class="form-control form-control-lg" placeholder="Nhập tên sách, tác giả, hoặc từ khóa...">
-        </div>
-
-
-        <div class="col-md-4">
-          <button type="submit" class="btn btn-primary btn-lg w-100">
-            <i class="bi bi-search me-2"></i>Tìm kiếm
-          </button>
-        </div>
-      </div>
-    </form>
-
-  </div>
-</div>
-
 
 {% if popular_books %}
 <section class="mb-5">
@@ -120,8 +92,10 @@
       <a href="{{ url_for('books', category_id=category.id) }}" class="text-decoration-none">
         <div class="card h-100 border-0 bg-light category-card">
           <div class="card-body text-center">
+
             <i class="bi bi-bookmark-fill text-primary mb-3" style="font-size: 2rem;"></i>
             <h6 class="card-title">{{ category.name }}</h6>
+
             {% if category.description %}
               <p class="card-text small text-muted">{{ category.description }}</p>
             {% endif %}
@@ -169,6 +143,5 @@
     </div>
   </div>
 </section>
-
 
 {% endblock %}

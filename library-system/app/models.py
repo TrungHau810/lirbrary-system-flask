@@ -3,7 +3,6 @@ from enum import Enum as RoleEnum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.functions import now
 
-
 from . import db
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, Enum, func
@@ -15,9 +14,16 @@ class UserRole(RoleEnum):
     STUDENT = 3
 
 
+class StatusEnum(RoleEnum):
+    PENDING = 1
+    APPROVED = 2
+    REJECTED = 3
+    RETURNED = 4
+
+
 class User(db.Model, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(100), nullable=False, unique=True)
+    username = Column(String(255), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=False)
     avatar = Column(String(255), nullable=False)
@@ -26,7 +32,6 @@ class User(db.Model, UserMixin):
     # Relationships
     borrowing_slips = relationship("BorrowingSlip", backref="user", lazy=True)
     receipts = relationship("Receipt", backref="user", lazy=True)
-
 
     def __str__(self):
         return self.full_name
@@ -66,7 +71,6 @@ class Publisher(db.Model):
         return f'NXB: {self.name}'
 
 
-
 class Book(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
@@ -83,25 +87,24 @@ class Book(db.Model):
     category_id = Column(Integer, ForeignKey(Category.id))
     author_id = Column(Integer, ForeignKey(Author.id))
     publisher_id = Column(Integer, ForeignKey(Publisher.id))
-    
+
     def __str__(self):
         return self.name
-    
+
     @property
     def is_available(self):
         return self.available_quantity > 0
-
 
 
 class BorrowingSlip(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_user = Column(Integer, ForeignKey(User.id))
     created_date = Column(DateTime, default=func.now())
+    status = Column(Enum(StatusEnum), nullable=False, default=StatusEnum.PENDING)
     is_return = Column(Boolean, nullable=True, default=False)
     return_date = Column(DateTime, nullable=True)
     # Relationships
     details = relationship("BorrowingSlipDetail", backref="borrowing_slip", lazy=True)
-
 
 
 class BorrowingSlipDetail(db.Model):
