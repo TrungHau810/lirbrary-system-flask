@@ -1,3 +1,5 @@
+import hashlib
+
 from flask import Flask, render_template, request, abort, flash, redirect, url_for
 from werkzeug.security import generate_password_hash
 from . import app, db
@@ -53,8 +55,8 @@ def book_detail(book_id):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
 
         user = login_user(username, password)
         if user:
@@ -89,7 +91,7 @@ def register():
             username=username,
             full_name=fullname,
             email=email,
-            password=generate_password_hash(password, method="pbkdf2:sha256", salt_length=16),
+            password=str(hashlib.md5(password.encode('utf-8')).hexdigest()),
             avatar="default.png",
             user_role=UserRole.STUDENT
         )
