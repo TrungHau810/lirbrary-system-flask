@@ -1,3 +1,4 @@
+
 import hashlib
 
 from flask import Flask, render_template, request, abort, flash, redirect, url_for
@@ -5,7 +6,7 @@ from flask_login import login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import app, db
 from .dao import search_books, get_book, get_all_authors, get_all_publishers, get_popular_books, get_books_by_category, \
-    get_users, login_account
+    get_users, login_account, get_list_requests
 from .auth.decorators import role_required
 from .models import Category, User, UserRole, Book, Author, Publisher
 
@@ -244,6 +245,13 @@ def create_book():
 
     return render_template("staff_book_form.html", categories=categories, authors=authors, publishers=publishers)
 
-
+@app.route("/staff/borrow-requests")
+def borrow_requests():
+    data = get_list_requests()
+    for r in data:
+        print(r.user.full_name)
+        print(r.status)
+    return render_template("borrow_requests.html",
+                           list_requests=data)
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1', port=5000)

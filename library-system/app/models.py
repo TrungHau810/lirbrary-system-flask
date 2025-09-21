@@ -13,6 +13,7 @@ class UserRole(RoleEnum):
     STAFF = 2
     STUDENT = 3
 
+
 class StatusEnum(RoleEnum):
     PENDING = 1
     APPROVED = 2
@@ -31,7 +32,6 @@ class User(db.Model, UserMixin):
     # Relationships
     borrowing_slips = relationship("BorrowingSlip", backref="user", lazy=True)
     receipts = relationship("Receipt", backref="user", lazy=True)
-
 
     def __str__(self):
         return self.full_name
@@ -71,7 +71,6 @@ class Publisher(db.Model):
         return f'NXB: {self.name}'
 
 
-
 class Book(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
@@ -88,14 +87,13 @@ class Book(db.Model):
     category_id = Column(Integer, ForeignKey(Category.id))
     author_id = Column(Integer, ForeignKey(Author.id))
     publisher_id = Column(Integer, ForeignKey(Publisher.id))
-    
+
     def __str__(self):
         return self.name
-    
+
     @property
     def is_available(self):
         return self.available_quantity > 0
-
 
 
 class BorrowingSlip(db.Model):
@@ -107,7 +105,6 @@ class BorrowingSlip(db.Model):
     return_date = Column(DateTime, nullable=True)
     # Relationships
     details = relationship("BorrowingSlipDetail", backref="borrowing_slip", lazy=True)
-
 
 
 class BorrowingSlipDetail(db.Model):
