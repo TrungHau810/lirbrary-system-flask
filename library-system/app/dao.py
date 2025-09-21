@@ -15,7 +15,7 @@ def auth_user(username, password):
     return False
 
 
-def login_user(username, password):
+def login_account(username, password):
     user = User.query.filter_by(username=username).first()
     if user and user.password == str(hashlib.md5(password.encode('utf-8')).hexdigest()):
         return user

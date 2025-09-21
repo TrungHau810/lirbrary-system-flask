@@ -4,8 +4,6 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 
-
-
 <div class="bg-primary text-white rounded-4 p-5 mb-5">
   <div class="row align-items-center">
     <div class="col-lg-8">
@@ -27,32 +25,6 @@
     </div>
   </div>
 </div>
-
-
-<div class="card shadow-sm mb-5">
-  <div class="card-body">
-    <h5 class="card-title mb-3">
-      <i class="bi bi-lightning-fill text-warning me-2"></i>Tìm kiếm nhanh
-    </h5>
-
-    <form action="{{ url_for('books') }}" method="get">
-      <div class="row g-3">
-        <div class="col-md-8">
-          <input name="kw" class="form-control form-control-lg" placeholder="Nhập tên sách, tác giả, hoặc từ khóa...">
-        </div>
-
-
-        <div class="col-md-4">
-          <button type="submit" class="btn btn-primary btn-lg w-100">
-            <i class="bi bi-search me-2"></i>Tìm kiếm
-          </button>
-        </div>
-      </div>
-    </form>
-
-  </div>
-</div>
-
 
 {% if popular_books %}
 <section class="mb-5">
@@ -171,6 +143,5 @@
     </div>
   </div>
 </section>
-
 
 {% endblock %}
