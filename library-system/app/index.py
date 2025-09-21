@@ -1,3 +1,5 @@
+import hashlib
+
 from flask import Flask, render_template, request, abort, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -64,7 +66,7 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if user and check_password_hash(user.password, password):
+        if user and user.password == str(hashlib.md5(password.encode('utf-8')).hexdigest()):
             login_user(user)
             flash("Đăng nhập thành công", "success")
 
@@ -106,7 +108,7 @@ def register():
             username=username,
             full_name=fullname,
             email=email,
-            password=generate_password_hash(password, method="pbkdf2:sha256", salt_length=8),
+            password=str(hashlib.md5(password.encode('utf-8')).hexdigest()),
             avatar="default.png",
             user_role=UserRole.STUDENT
         )
