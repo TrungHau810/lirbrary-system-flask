@@ -15,6 +15,12 @@ class UserRole(RoleEnum):
     STUDENT = 3
 
 
+class Status(RoleEnum):
+    PENDING = 1
+    APPROVED = 2
+    REJECTED = 3
+
+
 class User(db.Model, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(100), nullable=False, unique=True)
@@ -97,6 +103,7 @@ class BorrowingSlip(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_user = Column(Integer, ForeignKey(User.id))
     created_date = Column(DateTime, default=func.now())
+    status = Column(Enum(Status), nullable=False, default=Status.PENDING)
     is_return = Column(Boolean, nullable=True, default=False)
     return_date = Column(DateTime, nullable=True)
     # Relationships

@@ -29,7 +29,19 @@
                                 <span class="badge bg-info text-dark fs-6">{{ req.total }}</span>
                             </td>
                             <td class="text-muted">{{ req.created_date }}</td>
-                            <td class="text-muted">Chờ duyệt</td>
+                           <td>
+                              {% if req.status.name == "PENDING" %}
+                                <span class="badge bg-warning text-dark">Đang chờ duyệt</span>
+                              {% elif req.status.name == "APPROVED" %}
+                                <span class="badge bg-success">Đã duyệt</span>
+                              {% elif req.status.name == "REJECTED" %}
+                                <span class="badge bg-danger">Từ chối</span>
+                              {% elif req.status.name == "RETURNED" %}
+                                <span class="badge bg-primary">Đã trả</span>
+                              {% else %}
+                                <span class="badge bg-secondary">{{ req.status.name }}</span>
+                              {% endif %}
+                            </td>
                             <td>
                                 <button class="btn btn-outline-info btn-sm d-flex align-items-center">
                                     <i class="bi bi-eye me-1"></i> Xem chi tiết
