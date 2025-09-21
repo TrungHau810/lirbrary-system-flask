@@ -61,7 +61,7 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/librarian/borrow-requests")
+@app.route("/staff/borrow-requests")
 def borrow_requests():
     data = dao.get_list_requests()
     return render_template("borrow_requests.html",
