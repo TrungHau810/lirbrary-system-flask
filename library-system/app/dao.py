@@ -1,6 +1,7 @@
+import hashlib
 import json
 from sqlalchemy import or_
-from .models import Book, Category, Author, Publisher
+from .models import Book, Category, Author, Publisher, User
 
 
 def auth_user(username, password):
@@ -12,6 +13,19 @@ def auth_user(username, password):
                 return True
 
     return False
+
+
+def login_user(username, password):
+    user = User.query.filter_by(username=username).first()
+    if user and user.password == str(hashlib.md5(password.encode('utf-8')).hexdigest()):
+        return user
+
+    return None
+
+
+def get_users():
+    user_list = User.query.all()
+    return user_list
 
 
 def search_books(keyword: str | None = None, category_id: int | None = None, author_id: int | None = None,
