@@ -41,12 +41,14 @@
               <option value="{{ a.id }}" {{ 'selected' if author_id==a.id else '' }}>{{ a.name }}</option>
             {% endfor %}
           </select>
+
         </div>
         <div class="col-md-6">
           <label for="publisher_id" class="form-label">Nhà xuất bản</label>
           <select id="publisher_id" name="publisher_id" class="form-select">
             <option value="">-- Tất cả NXB --</option>
             {% for p in publishers %}
+
               <option value="{{ p.id }}" {{ 'selected' if publisher_id==p.id else '' }}>{{ p.name }}</option>
             {% endfor %}
           </select>

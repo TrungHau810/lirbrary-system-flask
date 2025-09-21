@@ -16,7 +16,7 @@ class UserRole(RoleEnum):
 
 class User(db.Model, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(100), nullable=False, unique=True)
+    username = Column(String(255), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=False)
     avatar = Column(String(255), nullable=False)

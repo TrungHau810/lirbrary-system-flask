@@ -18,9 +18,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 
 # Initialize extensions BEFORE importing models
 db = SQLAlchemy(app)
-login = LoginManager()
-login.login_view = 'auth.login'
-login.init_app(app)
+login = LoginManager(app)
+login.login_view = 'login'
+
 migrate = Migrate(app, db)
 
 from . import models
