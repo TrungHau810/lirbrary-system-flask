@@ -27,10 +27,6 @@ def books():
     authors = get_all_authors()
     publishers = get_all_publishers()
 
-    print(data)
-
-
-
     return render_template("books.html",
                          books=data,
                          categories=categories,

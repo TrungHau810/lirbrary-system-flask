@@ -21,6 +21,7 @@ def manage_books():
 
 @app.route("/admin/manage_books/add")
 def add_book_view():
+
     return render_template("admin/book_form.html")
 
 

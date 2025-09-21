@@ -42,7 +42,7 @@
                     <td>
                         {% if user.user_role.name == 'ADMIN' %}
                             <span class="badge bg-danger">Admin</span>
-                        {% elif user.user_role == 'STAFF' %}
+                        {% elif user.user_role.name == 'STAFF' %}
                             <span class="badge bg-warning text-dark">Thủ thư</span>
                         {% else %}
                             <span class="badge bg-secondary">Sinh viên</span>
