@@ -7,10 +7,12 @@
         <div class="col-lg-8 col-xl-6">
             <div class="card shadow-sm">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">Thêm người dùng vào hệ thống thư viện số</h4>
+                    <h4 class="card-title mb-0">
+                        {% if user %}Chỉnh sửa người dùng{% else %}Thêm người dùng mới{% endif %}
+                    </h4>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="username" class="form-label">Tên đăng nhập</label>
                             <input type="text" id="username" name="username" value="{{ user.username if user else '' }}"
@@ -40,17 +42,28 @@
                         </div>
                         {% endif %}
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="text" id="email" name="email" required
-                                   class="form-control">
+                            <label for="avatar" class="form-label">Ảnh đại diện</label>
+                            <input type="file" id="avatar" name="avatar" class="form-control">
                         </div>
+                        {% if user and user.avatar %}
+                        <div class="mb-3">
+                            <label class="form-label">Ảnh đại diện hiện tại</label><br>
+                            <img src="{{ user.avatar }}" alt="Avatar" class="img-thumbnail" style="max-width: 150px;">
+                        </div>
+                        {% endif %}
                         <div class="mb-3">
                             <label for="user_role" class="form-label">Vai trò</label>
                             <select name="user_role" id="user_role" required class="form-select">
                                 <option value="">-- Chọn vai trò --</option>
-                                <option value="1">Admin</option>
-                                <option value="2">Thủ thư</option>
-                                <option value="3">Sinh viên</option>
+                                <option value="ADMIN" {% if user and user.user_role and user.user_role.value == 1 %}selected{% endif %}>
+                                    Admin
+                                </option>
+                                <option value="STAFF" {% if user and user.user_role and user.user_role.value == 2 %}selected{% endif %}>
+                                    Thủ thư
+                                </option>
+                                <option value="STUDENT" {% if user and user.user_role and user.user_role.value == 3 %}selected{% endif %}>
+                                    Sinh viên
+                                </option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Lưu</button>

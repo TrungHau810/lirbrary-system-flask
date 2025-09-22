@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý kho sách{% endblock %}
+
+{% block content %}
+<h3 class="mb-4">{{ rule.id and 'Chỉnh sửa quy định' or 'Thêm mới quy định' }}</h3>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" action="{{ rule.id and url_for('admin_edit_rule', rule_id=rule.id) or url_for('admin_add_rule') }}">
+
+            <!-- Mã quy định -->
+            <div class="mb-3">
+                <label for="id" class="form-label">Mã quy định</label>
+                <input type="text" id="id" name="id"
+                       value="{{ rule.id and '#' ~ rule.id or 'Mã tự động' }}"
+                       class="form-control"
+                       {% if rule.id %}readonly{% endif %}
+                        readonly>
+            </div>
+
+            <!-- Nội dung quy định -->
+            <div class="mb-3">
+                <label for="name" class="form-label">Nội dung quy định</label>
+                <input type="text" id="name" name="name"
+                       value="{{ rule.name or '' }}"
+                       class="form-control"
+                       {% if rule.id %}readonly{% endif %} required>
+            </div>
+
+            <!-- Giá trị -->
+            <div class="mb-3">
+                <label for="value" class="form-label">Giá trị</label>
+                <input type="text" id="value" name="value" value="{{ rule.value or '' }}" class="form-control" required>
+            </div>
+
+            <!-- Nút lưu -->
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save me-1"></i>{{ rule.id and 'Lưu thay đổi' or 'Thêm mới' }}
+            </button>
+
+            <a href="{{ url_for('admin_rule') }}" class="btn btn-secondary ms-2">
+                <i class="bi bi-arrow-left me-1"></i>Quay lại
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -31,14 +31,15 @@
             <i class="bi bi-search me-1"></i>Tìm kiếm sách
           </a>
         </li>
-
+        {% if current_user.is_authenticated and current_user.user_role.name != 'ADMIN' %}
         <li class="nav-item">
           <a class="nav-link" href="#">
             <i class="bi bi-basket3-fill me-1"></i>Mượn sách
           </a>
         </li>
+        {% endif %}
 
-        {% if current_user.is_authenticated and current_user.user_role and current_user.user_role.name in ['ADMIN','STAFF'] %}
+        {% if current_user.is_authenticated and current_user.user_role and current_user.user_role.name in ['STAFF'] %}
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('create_book') }}">
             <i class="bi bi-plus-circle me-1"></i>Thêm sách mới
@@ -50,8 +51,24 @@
             <i class="bi bi-search me-1"></i>Yêu cầu mượn sách
           </a>
         </li>
+        {% if current_user.is_authenticated and current_user.user_role and current_user.user_role.name in ['ADMIN'] %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('admin_users') }}">
+            <i class="bi bi-people-fill me-1"></i>Quản lý người dùng
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('admin_rule') }}">
+            <i class="bi bi-tags-fill me-1"></i>Các quy định
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('admin_stats') }}">
+            <i class="bi bi-bar-chart-fill me-1"></i>Thống kê - báo cáo
+          </a>
+        </li>
       </ul>
-
+      {% endif %}
       <ul class="navbar-nav">
         {% if current_user.is_authenticated %}
           <li class="nav-item">
@@ -123,5 +140,6 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

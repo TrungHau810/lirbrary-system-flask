@@ -1,5 +1,6 @@
 from urllib.parse import quote
 
+import cloudinary
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
@@ -22,13 +23,19 @@ login = LoginManager(app)
 login.login_view = 'login'
 
 migrate = Migrate(app, db)
-
 from . import models
 from . import index
 
 
 
 from . import admin
+
+cloudinary.config(
+    cloud_name="tthau2004",
+    api_key="372274126191375",
+    api_secret="Abk-RA6C6MUKDV34nOuFDhpLFjs",
+    secure=True)
+
 
 @login.user_loader
 def load_user(user_id):

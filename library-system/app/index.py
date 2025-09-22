@@ -1,12 +1,13 @@
-
 import hashlib
 
+from click import confirm
 from flask import Flask, render_template, request, abort, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import app, db
 from .dao import search_books, get_book, get_all_authors, get_all_publishers, get_popular_books, get_books_by_category, \
-    get_users, login_account, get_list_requests
+    get_users, login_account, get_list_requests, add_user, update_user, get_user_by_username, get_user_by_email, \
+    delete_user
 from .auth.decorators import role_required
 from .models import Category, User, UserRole, Book, Author, Publisher
 
@@ -119,40 +120,6 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/admin")
-@login_required
-@role_required(["ADMIN"])
-def admin_index():
-    return render_template("index.html")
-
-
-@app.route("/admin/users")
-@login_required
-@role_required(["ADMIN"])
-def admin_users():
-    user_list = get_users()
-    return render_template("admin/users.html",
-                           users=user_list)
-
-
-@app.route("/admin/users/add")
-@login_required
-@role_required(["ADMIN"])
-def admin_add_user():
-    return render_template("admin/user_form.html")
-
-
-@app.route("/admin/users/edit/<int:user_id>")
-@login_required
-@role_required(["ADMIN"])
-def admin_edit_user(user_id):
-    u = User.query.get(user_id)
-    if not u:
-        abort(404)
-
-    return render_template("admin/user_form.html", user=u)
-
-
 # func nay phan theo role
 @app.route("/staff/books/new", methods=["GET", "POST"])
 @login_required
@@ -245,6 +212,7 @@ def create_book():
 
     return render_template("staff_book_form.html", categories=categories, authors=authors, publishers=publishers)
 
+
 @app.route("/staff/borrow-requests")
 def borrow_requests():
     data = get_list_requests()
@@ -253,5 +221,7 @@ def borrow_requests():
         print(r.status)
     return render_template("borrow_requests.html",
                            list_requests=data)
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1', port=5000)
