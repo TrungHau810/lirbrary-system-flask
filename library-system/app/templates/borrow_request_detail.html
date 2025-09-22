@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Chi tiết phiếu mượn #{{ slip.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary fw-bold">Chi tiết phiếu mượn #{{ slip.id }}</h2>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <p><strong>Người mượn:</strong> {{ slip.user.full_name }}</p>
+            <p><strong>Ngày yêu cầu:</strong> {{ slip.created_date }}</p>
+            <p><strong>Trạng thái:</strong> {{ slip.status.name }}</p>
+            <p><strong>Số lần bị phạt:</strong>
+                <span class="fw-bold text-danger">{{ fine_count }}</span>
+            </p>
+            {% if slip.user.fine %}
+            <h6>Danh sách các lần bị phạt:</h6>
+            <ul>
+                {% for fine in slip.user.fine %}
+                <li>{{ fine.date.strftime('%d/%m/%Y') }} - {{ fine.reason }} ({{ fine.amount }} VNĐ)</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>Người này chưa từng bị phạt.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <h4 class="mb-3">Danh sách sách mượn</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Tên sách</th>
+            <th>Tác giả</th>
+            <th>Thể loại</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for d in slip.details %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ d.book.name }}</td>
+            <td>{{ d.book.author }}</td>
+            <td>{{ d.book.category }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('borrow_requests') }}" class="btn btn-secondary mt-3">Quay lại</a>
+</div>
+{% endblock %}

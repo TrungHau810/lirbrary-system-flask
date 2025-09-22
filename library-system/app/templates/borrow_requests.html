@@ -10,55 +10,58 @@
             <div class="table-responsive">
                 <table class="table table-striped table-hover align-middle text-center">
                     <thead class="table-dark">
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Tên người mượn</th>
-                            <th scope="col">Số lượng sách</th>
-                            <th scope="col">Ngày yêu cầu</th>
-                            <th scope="col">Trạng thái</th>
-                            <th scope="col">Chi tiết</th>
-                            <th scope="col">Hành động</th>
-                        </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Tên người mượn</th>
+                        <th scope="col">Số lượng sách</th>
+                        <th scope="col">Ngày yêu cầu</th>
+                        <th scope="col">Trạng thái</th>
+                        <th scope="col">Chi tiết</th>
+                        <th scope="col">Hành động</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for req in list_requests %}
-                        <tr>
-                            <td>{{ req.id }}</td>
-                            <td class="fw-semibold">{{ req.user }}</td>
-                            <td>
-                                <span class="badge bg-info text-dark fs-6">{{ req.total }}</span>
-                            </td>
-                            <td class="text-muted">{{ req.created_date }}</td>
-                           <td>
-                              {% if req.status.name == "PENDING" %}
-                                <span class="badge bg-warning text-dark">Đang chờ duyệt</span>
-                              {% elif req.status.name == "APPROVED" %}
-                                <span class="badge bg-success">Đã duyệt</span>
-                              {% elif req.status.name == "REJECTED" %}
-                                <span class="badge bg-danger">Từ chối</span>
-                              {% elif req.status.name == "RETURNED" %}
-                                <span class="badge bg-primary">Đã trả</span>
-                              {% else %}
-                                <span class="badge bg-secondary">{{ req.status.name }}</span>
-                              {% endif %}
-                            </td>
-                            <td>
-                                <button class="btn btn-outline-info btn-sm d-flex align-items-center">
-                                    <i class="bi bi-eye me-1"></i> Xem chi tiết
+                    {% for req in list_requests %}
+                    <tr id="row-{{ req.id }}">
+                        <td>{{ req.id }}</td>
+                        <td class="fw-semibold">{{ req.user }}</td>
+                        <td>
+                            <span class="badge bg-info text-dark fs-6">{{ req.total }}</span>
+                        </td>
+                        <td class="text-muted">{{ req.created_date }}</td>
+                        <td class="status-badge">
+                            {% if req.status.name == "PENDING" %}
+                            <span class="badge bg-warning text-dark">Đang chờ duyệt</span>
+                            {% elif req.status.name == "APPROVED" %}
+                            <span class="badge bg-success">Đã duyệt</span>
+                            {% elif req.status.name == "REJECTED" %}
+                            <span class="badge bg-danger">Từ chối</span>
+                            {% elif req.status.name == "RETURNED" %}
+                            <span class="badge bg-primary">Đã trả</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ req.status.name }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('borrow_request_detail', slip_id=req.id) }}"
+                               class="btn btn-outline-info btn-sm d-flex align-items-center">
+                                <i class="bi bi-eye me-1"></i> Xem chi tiết
+                            </a>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <button onclick="updateStatus({{ req.id }}, 'APPROVED')"
+                                        class="btn btn-success btn-sm d-flex align-items-center">
+                                    <i class="bi bi-check-circle me-1"></i> Duyệt
                                 </button>
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-center gap-2">
-                                    <button class="btn btn-success btn-sm d-flex align-items-center">
-                                        <i class="bi bi-check-circle me-1"></i> Duyệt
-                                    </button>
-                                    <button class="btn btn-danger btn-sm d-flex align-items-center">
-                                        <i class="bi bi-x-circle me-1"></i> Từ chối
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
+                                <button onclick="updateStatus({{ req.id }}, 'REJECTED')"
+                                        class="btn btn-danger btn-sm d-flex align-items-center">
+                                    <i class="bi bi-x-circle me-1"></i> Từ chối
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -72,4 +75,6 @@
         <i class="bi bi-search"></i>
     </button>
 </div>
+
+<script src="{{ url_for('static', filename='js/borrow_requests.js') }}"></script>
 {% endblock %}
