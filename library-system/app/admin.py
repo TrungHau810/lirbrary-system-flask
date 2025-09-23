@@ -108,14 +108,71 @@ def admin_edit_user(user_id):
 @role_required(["ADMIN"])
 def admin_books():
     books = dao.get_books()
-    return render_template("index.html", books=books)
+    return render_template("admin/admin_books.html", books=books)
 
 
 @app.route("/admin/books/add", methods=["GET", "POST"])
 @login_required
 @role_required(["ADMIN"])
 def admin_add_book():
-    return render_template("index.html")
+    authors = dao.get_all_authors()
+    categories = dao.get_all_categories()
+    publishers = dao.get_all_publishers()
+    if request.method == "POST":
+        name = request.form.get("name")
+        description = request.form.get("description")
+        image = request.files["image"] if "image" in request.files else None
+        author_id = request.form.get("author_id", type=int)
+        category_id = request.form.get("category_id", type=int)
+        publisher_id = request.form.get("publisher_id", type=int)
+        isbn = request.form.get("isbn")
+        price = request.form.get("price", type=int)
+        quantity = request.form.get("quantity", type=int)
+        print("Data: ", name, description, image, author_id, category_id, publisher_id, isbn, price, quantity)
+        try:
+            dao.add_or_update_book(None, name, description, image, author_id, category_id, publisher_id, quantity, price)
+            flash("Thêm sách thành công!", "success")
+            return redirect(url_for("admin_books"))
+        except Exception as ex:
+            flash("Có lỗi xảy ra khi thêm sách: %s" % ex, "danger")
+    return render_template("admin/admin_book_form.html",
+                           book={},
+                           authors=authors,
+                           categories=categories,
+                           publishers=publishers)
+
+
+@app.route("/admin/books/edit/<int:book_id>", methods=["GET", "POST"])
+@login_required
+@role_required(["ADMIN"])
+def admin_edit_book(book_id):
+    book = dao.get_book(book_id)
+    authors = dao.get_all_authors()
+    categories = dao.get_all_categories()
+    publishers = dao.get_all_publishers()
+    if not book:
+        abort(404)
+
+    if request.method == "POST":
+        name = request.form.get("name")
+        description = request.form.get("description")
+        image = request.files["image"] if "image" in request.files else None
+        author_id = request.form.get("author_id", type=int)
+        category_id = request.form.get("category_id", type=int)
+        publisher_id = request.form.get("publisher_id", type=int)
+        isbn = request.form.get("isbn")
+        price = request.form.get("price", type=int)
+        quantity = request.form.get("quantity", type=int)
+
+        print("Data: ", name, description, image, author_id, category_id, publisher_id, isbn, price, quantity)
+        updated_book = dao.add_or_update_book(book_id, name, description, image, author_id, category_id, publisher_id, quantity, price)
+        if updated_book:
+            flash("Cập nhật sách thành công!", "success")
+            return redirect(url_for("admin_books"))
+        else:
+            flash("Có lỗi xảy ra khi cập nhật sách", "danger")
+    return render_template("admin/admin_book_form.html", book=book,
+                           authors=authors, categories=categories, publishers=publishers)
 
 
 # Thống kê
@@ -155,6 +212,7 @@ def admin_rule():
     rules = dao.get_rules()
     return render_template("admin/rule.html", rules=rules)
 
+
 @app.route("/admin/rule/edit/<int:rule_id>", methods=["GET", "POST"])
 @login_required
 @role_required(["ADMIN"])
@@ -175,6 +233,7 @@ def admin_edit_rule(rule_id):
             flash("Có lỗi xảy ra khi cập nhật quy định", "danger")
 
     return render_template("admin/rule_detail.html", rule=rule)
+
 
 @app.route("/admin/rule/add", methods=["GET", "POST"])
 @login_required

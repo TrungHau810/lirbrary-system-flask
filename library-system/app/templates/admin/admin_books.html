@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý kho sách{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0">
+    <i class="bi bi-folder-symlink me-2"></i>Quản lý kho sách
+  </h1>
+  <a href="{{ url_for('admin_add_book') }}" class="btn btn-success">
+    <i class="bi bi-plus-circle me-1"></i>Thêm sách mới
+  </a>
+</div>
+
+<!-- Thanh tìm kiếm và bộ lọc -->
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <form method="get" action="">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+          <label for="kw" class="form-label">Từ khóa</label>
+          <input type="text" id="kw" name="kw" placeholder="Nhập tên sách, tác giả..." value="{{ kw or '' }}" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label for="category_id" class="form-label">Thể loại</label>
+          <select id="category_id" name="category_id" class="form-select">
+            <option value="">-- Tất cả thể loại --</option>
+            {% for c in categories %}
+              <option value="{{ c.id }}" {{ 'selected' if category_id==c.id else '' }}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-search me-1"></i>Tìm
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Hiển thị flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- Bảng danh sách sách -->
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Tên sách</th>
+            <th scope="col">Loại sách</th>
+            <th scope="col">Tác giả</th>
+            <th scope="col" class="text-center">Chức năng</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for book in books %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ book.name }}</td>
+            <td>{{ book.category.name }}</td>
+            <td>{{ book.author.name }}</td>
+            <td class="text-center">
+              <div class="btn-group btn-group-sm">
+                <a href="{{ url_for('admin_edit_book', book_id=book.id) }}" class="btn btn-outline-primary">
+                  <i class="bi bi-pencil-square"></i> Sửa
+                </a>
+                <form action="" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sách này không?');">
+                  <button type="submit" class="btn btn-outline-danger">
+                    <i class="bi bi-trash"></i> Xóa
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">Không có sách nào.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

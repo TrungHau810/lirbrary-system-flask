@@ -148,7 +148,7 @@ def borrowing_return_rate():
         return 0.0
 
     # Đếm phiếu đã trả (is_return = True)
-    returned_slips = BorrowingSlip.query.filter(BorrowingSlip.is_return ==True).count()
+    returned_slips = BorrowingSlip.query.filter(BorrowingSlip.is_return == True).count()
 
     # Tính tỉ lệ và làm tròn 2 chữ số
     return round((returned_slips / total_slips) * 100, 2)
@@ -157,8 +157,10 @@ def borrowing_return_rate():
 def get_rules():
     return Rule.query.all()
 
+
 def get_rule_by_id(rule_id: int) -> Rule | None:
     return Rule.query.get(rule_id)
+
 
 def update_rule(rule_id: int, name: str, value: int):
     rule = Rule.query.get(rule_id)
@@ -170,11 +172,13 @@ def update_rule(rule_id: int, name: str, value: int):
     db.session.commit()
     return rule
 
+
 def add_rule(name: str, value: int):
     new_rule = Rule(name=name, value=value)
     db.session.add(new_rule)
     db.session.commit()
     return new_rule
+
 
 def delete_rule(rule_id: int):
     rule = Rule.query.get(rule_id)
@@ -184,6 +188,7 @@ def delete_rule(rule_id: int):
     db.session.delete(rule)
     db.session.commit()
     return True
+
 
 def search_books(keyword: str | None = None, category_id: int | None = None, author_id: int | None = None,
                  publisher_id: int | None = None):
@@ -227,12 +232,51 @@ def get_all_publishers():
     return Publisher.query.order_by(Publisher.name.asc()).all()
 
 
+def get_all_categories():
+    return Category.query.order_by(Category.name.asc()).all()
+
+
 def get_popular_books(limit=10):
     return Book.query.filter(Book.available_quantity > 0).order_by(Book.created_date.desc()).limit(limit).all()
 
 
 def get_books_by_category(category_id: int, limit=10):
     return Book.query.filter(Book.category_id == category_id, Book.available_quantity > 0).limit(limit).all()
+
+
+def add_or_update_book(book_id, name, description, image, author_id, category_id, publisher, quantity, price):
+    book = Book.query.get(book_id)
+    if not book:
+        new_book = Book(
+            name=name,
+            description=description,
+            author_id=author_id,
+            category_id=category_id,
+            publisher_id=publisher,
+            quantity=quantity,
+            available_quantity=quantity,
+            price=price
+        )
+        if image:
+            res = cloudinary.uploader.upload(image)
+            new_book.image = res.get('secure_url')
+
+        db.session.add(new_book)
+        db.session.commit()
+        return new_book
+    else:
+        book.name = name
+        book.description = description
+        book.author_id = author_id
+        book.category_id = category_id
+        book.publisher_id = publisher
+        book.quantity = quantity
+        book.price = price
+        if image:
+            res = cloudinary.uploader.upload(image)
+            book.image = res.get('secure_url')
+    db.session.commit()
+    return book
 
 
 def get_list_requests():
