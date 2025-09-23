@@ -1,13 +1,14 @@
 import hashlib
+from datetime import timedelta
 
 from click import confirm
 from flask import Flask, render_template, request, abort, flash, redirect, url_for, jsonify
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import app, db
 from .dao import search_books, get_book, get_all_authors, get_all_publishers, get_popular_books, get_books_by_category, \
     get_users, login_account, get_list_requests, add_user, update_user, get_user_by_username, get_user_by_email, \
-    delete_user
+    delete_user, create_borrowing_slip, get_borrowing_slip_by_user, get_rule_date_return
 from .auth.decorators import role_required
 from .models import Category, User, UserRole, Book, Author, Publisher, BorrowingSlip, StatusEnum, Fine
 
@@ -213,7 +214,7 @@ def create_book():
     return render_template("staff_book_form.html", categories=categories, authors=authors, publishers=publishers)
 
 
-#Lấy danh sách các yêu cầu mượn sách
+# Lấy danh sách các yêu cầu mượn sách
 @app.route("/staff/borrow-requests")
 @login_required
 @role_required(["ADMIN", "STAFF"])
@@ -225,7 +226,8 @@ def borrow_requests():
     return render_template("borrow_requests.html",
                            list_requests=data)
 
-#Xem chi tiết yêu cầu mượn sách
+
+# Xem chi tiết yêu cầu mượn sách
 @app.route("/staff/borrow-requests/<int:slip_id>")
 @login_required
 @role_required(["ADMIN", "STAFF"])
@@ -234,7 +236,8 @@ def borrow_request_detail(slip_id):
     fine_count = Fine.query.filter_by(id_user=slip.id_user).count()
     return render_template("borrow_request_detail.html", slip=slip, fine_count=fine_count)
 
-#Duyệt yêu cầu mượn sách
+
+# Duyệt yêu cầu mượn sách
 @app.route("/staff/borrow-requests/<int:slip_id>/update", methods=["POST"])
 @login_required
 @role_required(["ADMIN", "STAFF"])
@@ -258,6 +261,46 @@ def update_borrow_requests(slip_id):
                 })
     db.session.commit()
     return jsonify({"success": True, "message": f"Trạng thái đã đổi thành {status}"})
+
+
+# Danh sách đãng ký mượn sách
+@app.route("/my-borrows")
+@login_required
+@role_required(["STUDENT"])
+def my_borrows():
+    slips = get_borrowing_slip_by_user(user_id=current_user.id)
+    date_return = get_rule_date_return()
+    for slip in slips:
+        slip.due_date = slip.created_date + timedelta(days=date_return)
+    return render_template("my_borrows.html", slips=slips)
+
+
+@app.route("/borrow")
+@login_required
+@role_required(["STUDENT"])
+def borrow_book():
+    book_id = request.args.get("book_id", type=int)
+    if not book_id:
+        flash("Yêu cầu không hợp lệ!", "danger")
+        return None
+
+    book = get_book(book_id)
+    if not book or book.available_quantity <= 0:
+        flash("Sách không tồn tại hoặc đã hết!", "danger")
+        return redirect(url_for("index"))
+
+    existing_request = BorrowingSlip.query.filter_by(id_user=current_user.id, status=StatusEnum.PENDING).first()
+    if existing_request:
+        flash("Bạn đã có một yêu cầu mượn đang chờ xử lý. Vui lòng đợi hoặc hủy yêu cầu trước.", "warning")
+        return redirect(url_for("index"))
+
+    slip = create_borrowing_slip(user_id=current_user.id, book_id=book_id)
+    if not slip:
+        flash("Có lỗi xảy ra khi tạo yêu cầu mượn sách.", "danger")
+        return redirect(url_for("index"))
+
+    flash("Yêu cầu mượn sách đã được gửi thành công!", "success")
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":

@@ -287,5 +287,40 @@ def get_list_requests():
     return requests
 
 
+def create_borrowing_slip(user_id, book_id):
+    new_slip = BorrowingSlip(
+        id_user=user_id,
+        status='PENDING',
+        created_date=datetime.now()
+    )
+    db.session.add(new_slip)
+    db.session.flush()  # Để lấy ID của phiếu mượn mới tạo
+
+    if not book_id:
+        db.session.rollback()
+        return None
+    else:
+        detail = BorrowingSlipDetail(
+            id_borrowing_slip=new_slip.id,
+            id_book=book_id
+        )
+        db.session.add(detail)
+
+    db.session.commit()
+    return new_slip
+
+def get_borrowing_slip_by_user(user_id):
+    slips = BorrowingSlip.query.filter(BorrowingSlip.id_user == user_id).all()
+    for s in slips:
+        s.detail = BorrowingSlipDetail.query.filter(BorrowingSlipDetail.id_borrowing_slip == s.id).first()
+
+    return slips
+
+def get_rule_date_return():
+    rule = Rule.query.filter(Rule.name == 'Số ngày mượn tối đa').first()
+    if rule:
+        return rule.value
+    return 7  # Mặc định 7 ngày nếu không có quy định
+
 if __name__ == "__main__":
     print(auth_user("user", 345))

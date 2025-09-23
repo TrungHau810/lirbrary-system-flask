@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Phiếu mượn sách{% endblock %}
+{% block content %}
+<h1 class="mb-4">Phiếu mượn sách của {{ current_user.full_name }}</h1>
+
+<table class="table table-striped table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Mã phiếu</th>
+            <th scope="col">Tên sách</th>
+            <th scope="col">Ngày mượn</th>
+            <th scope="col">Hạn trả</th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col">Ngày trả sách</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for slip in slips %}
+        <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ slip.id }}</td>
+            <td>{{ slip.detail.book.name }}</td>
+            <td>{{ slip.created_date.strftime("%d/%m/%Y") }}</td>
+            <td>{{ slip.due_date.strftime("%d/%m/%Y") }}</td>
+            <td>
+                {% if slip.status.name == 'PENDING' %}
+                    <span class="badge bg-primary">Đang chờ duyệt</span>
+                {% elif slip.status.name == 'RETURNED' %}
+                    <span class="badge bg-success">Đã trả</span>
+                {% elif slip.status.name == 'APPROVED' %}
+                    <span class="badge bg-danger">Đã duyệt</span>
+                {% elif slip.status.name == 'REJECTED' %}
+                    <span class="badge bg-secondary">Từ chối</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if slip.return_date %}
+                    {{ slip.return_date.strftime("%d/%m/%Y") }}
+                {% else %}
+                    ---
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" class="text-center">
+                Không có phiếu mượn <a href="#">mượn sách ngay</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

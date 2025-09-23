@@ -45,7 +45,7 @@
 
       <div class="d-grid gap-2">
         {% if b.is_available %}
-          <button class="btn btn-primary btn-lg">
+          <button class="btn btn-primary btn-lg" onclick="location.href='{{ url_for('borrow_book', book_id=b.id) }}'">
             <i class="bi bi-bookmark-plus me-2"></i>Đăng ký mượn
           </button>
         {% else %}
