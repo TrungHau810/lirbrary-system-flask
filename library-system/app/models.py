@@ -32,6 +32,7 @@ class User(db.Model, UserMixin):
     # Relationships
     borrowing_slips = relationship("BorrowingSlip", backref="user", lazy=True)
     receipts = relationship("Receipt", backref="user", lazy=True)
+    fine = relationship("Fine", backref="user", lazy=True)
 
     def __str__(self):
         return self.full_name
@@ -111,6 +112,8 @@ class BorrowingSlipDetail(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_borrowing_slip = Column(Integer, ForeignKey(BorrowingSlip.id))
     id_book = Column(Integer, ForeignKey(Book.id))
+    # Relationships
+    book = relationship("Book", backref="borrowing_details", lazy=True)
 
 
 # Bảng phiếu nhập sách

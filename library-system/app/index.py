@@ -1,7 +1,7 @@
 import hashlib
 
 from click import confirm
-from flask import Flask, render_template, request, abort, flash, redirect, url_for
+from flask import Flask, render_template, request, abort, flash, redirect, url_for, jsonify
 from flask_login import login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import app, db
@@ -9,7 +9,7 @@ from .dao import search_books, get_book, get_all_authors, get_all_publishers, ge
     get_users, login_account, get_list_requests, add_user, update_user, get_user_by_username, get_user_by_email, \
     delete_user
 from .auth.decorators import role_required
-from .models import Category, User, UserRole, Book, Author, Publisher
+from .models import Category, User, UserRole, Book, Author, Publisher, BorrowingSlip, StatusEnum, Fine
 
 
 @app.route("/")
@@ -213,7 +213,10 @@ def create_book():
     return render_template("staff_book_form.html", categories=categories, authors=authors, publishers=publishers)
 
 
+#Lấy danh sách các yêu cầu mượn sách
 @app.route("/staff/borrow-requests")
+@login_required
+@role_required(["ADMIN", "STAFF"])
 def borrow_requests():
     data = get_list_requests()
     for r in data:
@@ -221,6 +224,40 @@ def borrow_requests():
         print(r.status)
     return render_template("borrow_requests.html",
                            list_requests=data)
+
+#Xem chi tiết yêu cầu mượn sách
+@app.route("/staff/borrow-requests/<int:slip_id>")
+@login_required
+@role_required(["ADMIN", "STAFF"])
+def borrow_request_detail(slip_id):
+    slip = BorrowingSlip.query.get_or_404(slip_id)
+    fine_count = Fine.query.filter_by(id_user=slip.id_user).count()
+    return render_template("borrow_request_detail.html", slip=slip, fine_count=fine_count)
+
+#Duyệt yêu cầu mượn sách
+@app.route("/staff/borrow-requests/<int:slip_id>/update", methods=["POST"])
+@login_required
+@role_required(["ADMIN", "STAFF"])
+def update_borrow_requests(slip_id):
+    slip = BorrowingSlip.query.get(slip_id)
+    data = request.get_json()
+    status = data.get("status")
+
+    if status not in ["APPROVED", "REJECTED"]:
+        return jsonify({"success": False, "message": "Trạng thái không hợp lệ"})
+    slip.status = StatusEnum[status]
+    if status == "APPROVED":
+        for detail in slip.details:
+            book = Book.query.get(detail.id_book)
+            if book and book.available_quantity > 0:
+                book.available_quantity -= 1
+            else:
+                return jsonify({
+                    "success": False,
+                    "message": f"Sách {book.name} đã hết số lượng!"
+                })
+    db.session.commit()
+    return jsonify({"success": True, "message": f"Trạng thái đã đổi thành {status}"})
 
 
 if __name__ == "__main__":
